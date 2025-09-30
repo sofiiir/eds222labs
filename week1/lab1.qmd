@@ -97,6 +97,8 @@ prop.table(species_island_table, margin = 2)
 
 **Q2** How would you use `count()`, `group_by()`, `mutate()`, and pivoting to create row- and column-wise proportion tables?
 
+QUESTION: HOW TO PIVOT?
+
 ```{r}
 #| label: q2
 
@@ -235,6 +237,32 @@ Find a dataset containing multiple categorical and continuous variables. You'll 
 2.  Bar plot
 3.  Histogram
 4.  Scatterplot
+
+```{r}
+# Reading in harmful algal bloom data from a downloaded ncei.noaa.gov web
+algal_bloom <- read_csv(here::here("week1", "harmful-algal-blooms", "data", "habsos_20240430.csv"))
+```
+
+```{r}
+# Cleaning the data 
+algal_bloom <- janitor::clean_names(algal_bloom)
+
+```
+
+## Exploring harmful algal bloom data
+
+```{r}
+algal_bloom |> 
+  ggplot(aes(water_temp, cellcount)) +
+  geom_point() +
+  
+```
+
+```{r}
+algal_bloom |>  
+  ggplot(aes(cellcount)) +
+  geom_histogram(bin = .008)
+```
 
 ## Finished?
 
