@@ -251,17 +251,52 @@ algal_bloom <- janitor::clean_names(algal_bloom)
 
 ## Exploring harmful algal bloom data
 
+Making a contingency table
 ```{r}
 algal_bloom |> 
-  ggplot(aes(water_temp, cellcount)) +
-  geom_point() +
+  filter(cellcount != 0) |> 
+  count(water_temp, cellcount) |> 
+  group_by(water_temp) |> 
+  mutate(prop = n/sum(n)) |> 
+  ungroup()
+
+```
+
+
+```{r}
+algal_bloom |> 
+  filter(cellcount >= 100) |> 
+  count(cellcount) |> 
+  ggplot(aes(cellcount, n)) +
+  geom_point() 
   
+```
+```{r}
+algal_bloom |> 
+  filter(cellcount >= 100) |> 
+  group_by(state_id) |> 
+  summarize(mean_cellcount = mean(cellcount)) |> 
+  ggplot() +
+  geom_bar(aes(mean_cellcount))
+```
+
+Creating a histogram showing the algal bloom counts
+```{r}
+algal_bloom |> 
+  filter(cellcount >= 100) |> 
+  count(cellcount) |> 
+  ggplot(aes(cellcount)) +
+  geom_histogram(bin = 0.5) +
+  labs(title = "Algal Bloom Cell Count",
+       x = "Algal Bloom Cell Count",
+       y = "Frequency")+
+  theme_classic()
 ```
 
 ```{r}
-algal_bloom |>  
+algal_bloom |> 
   ggplot(aes(cellcount)) +
-  geom_histogram(bin = .008)
+  geom_bar()
 ```
 
 ## Finished?
