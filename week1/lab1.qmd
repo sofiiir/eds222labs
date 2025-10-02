@@ -288,9 +288,9 @@ algal_bloom |>
 algal_bloom |> 
   mutate(cellcount_log = log(cellcount + 1)) |> 
   ggplot(aes(cellcount_log)) +
-  geom_histogram() +
-  labs(title = "Logistic Cell Count of Harmful Algal Bloom",
-      x = "Log of Cell Count",
+  geom_histogram(bins = 30) +
+  labs(title = "Logarithmic Cell Count of Harmful Algal Bloom (HAB)",
+      x = "Log of Cell Count HAB",
       y = "Frequency") +
   theme_classic()
 ```
