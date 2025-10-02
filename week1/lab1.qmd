@@ -279,17 +279,38 @@ algal_bloom |>
   ggplot() +
   geom_bar(aes(mean_cellcount))
 ```
+```{r}
+algal_bloom |> 
+  count(category)
+```
+
+```{r}
+algal_bloom |> 
+  mutate(cellcount_log = log(cellcount + 1)) |> 
+  ggplot(aes(cellcount_log)) +
+  geom_histogram() +
+  labs(title = "Logistic Cell Count of Harmful Algal Bloom",
+      x = "Log of Cell Count",
+      y = "Frequency") +
+  theme_classic()
+```
+```{r}
+algal_bloom |> 
+  mutate(cellcount_log = log(cellcount + 1)) |> 
+  ggplot(aes(cellcount_log))+
+  geom_histogram()
+```
 
 Creating a histogram showing the algal bloom counts
 ```{r}
 algal_bloom |> 
-  filter(cellcount >= 100) |> 
+  mutate(cellcount_log = log(cellcount)) |> 
   count(cellcount) |> 
-  ggplot(aes(cellcount)) +
+  ggplot(aes(cellcount_log)) +
   geom_histogram(bin = 0.5) +
   labs(title = "Algal Bloom Cell Count",
        x = "Algal Bloom Cell Count",
-       y = "Frequency")+
+       y = "Frequency") +
   theme_classic()
 ```
 
