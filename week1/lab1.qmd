@@ -280,6 +280,11 @@ algal_bloom |>
   geom_bar(aes(mean_cellcount))
 ```
 ```{r}
+dim(algal_bloom)
+```
+
+Getting count of each category: 
+```{r}
 algal_bloom |> 
   count(category)
 ```
@@ -287,10 +292,12 @@ algal_bloom |>
 ```{r}
 algal_bloom |> 
   mutate(cellcount_log = log(cellcount + 1)) |> 
+   filter(cellcount != 0) |> 
   ggplot(aes(cellcount_log)) +
   geom_histogram(bins = 30) +
-  labs(title = "Logarithmic Cell Count of Harmful Algal Bloom (HAB)",
-      x = "Log of Cell Count HAB",
+  labs(title = "Harmful Algal Bloom (HAB), Karenia brevis, Logarithmic Cell Count",
+       subtitle = "Excluding zeros",
+      x = "Log of Karenia brevis Cell Count",
       y = "Frequency") +
   theme_classic()
 ```
