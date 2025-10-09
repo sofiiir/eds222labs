@@ -1,0 +1,78 @@
+---
+title: "Office hours"
+format: html
+---
+
+```{r}
+library(tidyverse)
+```
+# How much does snow change with latitude across plains and mountains? 
+
+# 1 Read the model definition
+
+# ACTUALLY the data generating process
+#snow ~ Normal(mu, sigma)
+# mu = beta_0 + beta_1 * lat +beta_2 * biomePlain
+
+# 2. Choose parameters and predictors
+# parameters
+```{r}
+beta_0 <- 70
+beta_1 <- 1.5
+beta_2 <- -50
+beta_3 <- -120
+sigma <- 15
+```
+
+#predictor 
+```{r}
+latitude <- runif(700, min = 0, max = 75)
+biome <- sample(c("mountains", "plains", "rivers"), 700, replace = TRUE)
+biomePlain <- as.integer(biome == "plains")
+biomeRiver <- as.integer(biome == "rivers")
+latitude <- rnorm(700, mean = case_when(biome == "mountains" ~ 50,
+                                        biome == "plains" ~ 15,
+                                        biome == "rivers" ~ 70),
+                                         sd = 12)
+tibble(latitude, biome) |> 
+  ggplot(aes(latitude, color = biome)) +
+  geom_density()
+```
+
+# 3. Use RVs to generate the response
+```{r}
+mu <- beta_0 + beta_1 * latitude + beta_2 + beta_3 * biomePlain
+snow <- rnorm(700, mean = mu, sd = sigma)
+snow_data <- tibble(latitude, biome, snow)
+ggplot(snow_data, aes(latitude, snow, color = biome)) +
+  geom_point() +
+  scale_color_manual(values = c("firebrick", "cornflowerblue", "hotpink")) +
+  theme_classic(18)
+  
+```
+# 4. fit mosel to simulated dat 
+```{r}
+snow_model_full <- lm(snow ~ latitude + biome, data = snow_data)
+summary(snow_model_full)
+```
+# What about the WRONG model? ie without the confounding variable included
+```{r}
+snow_model_confused <- lm(snow ~ latitude, data = snow_data)
+summary(snow_model_confused)
+```
+#lm model specification
+response ~ predictor1 + predictor2 + predictor3.. 
+
+
+
+```{r}
+library(palmerpenguins)
+ggplot(penguins, aes(body_mass_g, flipper_length_mm, color = island, shape = species))+
+  geom_point()+
+  theme_classic(18) 
+
+#fit lm to more than 1 categorical variable not to be confused with one categorical variable with multiple categories
+penguin_model <- lm(flipper_length_mm ~ body_mass_g + island + species, data = penguins) 
+summary(penguin_model)
+```
+
