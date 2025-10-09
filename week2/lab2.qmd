@@ -127,7 +127,7 @@ y_bar <- mean(storm_data$gage_ht)
 # can call beta_0_hat
 # beta_0_hat <- coef(storm_mod)
 x <- storm_data$precip_wk_in
-y_hat <- 3.9 + 2.2 * x
+y_hat <- 3.9 + 2.2 * x #WHY ARE WE DEFINING THIS? 
 
 SST <- sum((storm_data$gage_ht - y_bar)^2)
 
