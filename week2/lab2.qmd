@@ -211,7 +211,7 @@ Check out our model description - it tells us what to do next. $\mu$ is calculat
 #| label: generate-response
 
 mu <- beta_0 +beta_1 * x
-y <- rnorm(n = 100, mean = mu, sd = sigma)
+y <- rnorm(n = 100, mean = mu, sd = sigma) # WHY DO WE SET n TO EQUAL 100?
 
 ```
 
