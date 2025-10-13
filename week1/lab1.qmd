@@ -97,7 +97,7 @@ prop.table(species_island_table, margin = 2)
 
 **Q2** How would you use `count()`, `group_by()`, `mutate()`, and pivoting to create row- and column-wise proportion tables?
 
-QUESTION: HOW TO PIVOT?
+QUESTION: HOW TO PIVOT? HOW DO YOU ASSIGN BOTH PROP AND N TO THE FILL THE VALUES?
 
 ```{r}
 #| label: q2
@@ -105,7 +105,10 @@ QUESTION: HOW TO PIVOT?
 penguins |> 
   count(species, island) |> 
   group_by(species) |> 
-  mutate(prop = n/sum(n)) 
+  mutate(prop = n/sum(n)) |> 
+  pivot_wider(names_from = island,
+              values_from = prop,
+              values_fill = 0) 
 
 penguins |> 
   count(species, island) |> 
@@ -252,6 +255,7 @@ algal_bloom <- janitor::clean_names(algal_bloom)
 ## Exploring harmful algal bloom data
 
 Making a contingency table
+
 ```{r}
 algal_bloom |> 
   filter(cellcount != 0) |> 
@@ -262,7 +266,6 @@ algal_bloom |>
 
 ```
 
-
 ```{r}
 algal_bloom |> 
   filter(cellcount >= 100) |> 
@@ -271,6 +274,7 @@ algal_bloom |>
   geom_point() 
   
 ```
+
 ```{r}
 algal_bloom |> 
   filter(cellcount >= 100) |> 
@@ -279,11 +283,13 @@ algal_bloom |>
   ggplot() +
   geom_bar(aes(mean_cellcount))
 ```
+
 ```{r}
 dim(algal_bloom)
 ```
 
-Getting count of each category: 
+Getting count of each category:
+
 ```{r}
 algal_bloom |> 
   count(category)
@@ -301,6 +307,7 @@ algal_bloom |>
       y = "Frequency") +
   theme_classic()
 ```
+
 ```{r}
 algal_bloom |> 
   mutate(cellcount_log = log(cellcount + 1)) |> 
@@ -309,6 +316,7 @@ algal_bloom |>
 ```
 
 Creating a histogram showing the algal bloom counts
+
 ```{r}
 algal_bloom |> 
   mutate(cellcount_log = log(cellcount)) |> 
