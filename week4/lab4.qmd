@@ -134,13 +134,13 @@ Shuffling
 #| label: q5
 #| eval: false
 
-one_permutation <- restoration %>% 
+one_permutation <- restoration |>  
   mutate(treatment = sample(treatment, 
                       size = length(treatment), 
                       replace = FALSE))
 
-permutation_props <- one_permutation %>% 
-  group_by(treatment) %>% 
+permutation_props <- one_permutation |>  
+  group_by(treatment) |>  
   summarize(prop_success = sum(success)/n())
 
 permutation_diff_props <- permutation_props$prop_success[2] - permutation_props$prop_success[1]
@@ -158,13 +158,13 @@ That gives us the value of the test statistic for just one permutation. To get a
 #| eval: false
 
 permute <- function(i) {
- one_permutation <- restoration %>% 
+ one_permutation <- restoration |>  
   mutate(treatment = sample(treatment, 
                       size = length(treatment), 
                       replace = FALSE))
 
-permutation_props <- one_permutation %>% 
-  group_by(treatment) %>% 
+permutation_props <- one_permutation |>  
+  group_by(treatment) |>  
   summarize(prop_success = sum(success)/n())
 
 permutation_diff_props <- permutation_props$prop_success[2] - permutation_props$prop_success[1]
@@ -172,7 +172,7 @@ permutation_diff_props <- permutation_props$prop_success[2] - permutation_props$
 permutation_diff_props
 }
 
-null_distribution <- map_dbl(1:1000, permute)
+null_distribution <- map_dbl(1:10000, permute)
 
 ```
 
@@ -181,10 +181,12 @@ null_distribution <- map_dbl(1:1000, permute)
 ```{r}
 #| label: q7
 
-ggplot() +
-  geom_histogram(aes(null_distribution)) +
+ggplot(tibble(null_distribution)) +
+  geom_histogram(aes(null_distribution),
+                 binwidth = 0.04) +
   geom_vline(xintercept = diff,
-             color = "hotpink")
+             color = "hotpink",
+             linewidth = 2)
 
 
 
@@ -200,7 +202,7 @@ The p-value is *the probability of a test statistic [at least]{.underline} as ex
 #| label: q8
 #| eval: false
 
-p_val <- sum(null_distribution >= diff)/1000
+p_val <- sum(null_distribution >= diff)/length(null_distribution)
 
 p_val
 
@@ -241,12 +243,13 @@ This is the key part of bootstrapping! Remember, our goal is to estimate the var
 #| label: q12
 #| eval: false
 
-one_bootstrap <- ??? %>% 
-  ??? %>% 
-  mutate(??? = sample(???,
-                      size = length(???),
-                      replace = ???)) %>% 
-  ungroup()
+one_bootstrap <- restoration |>  
+  group_by(treatment) |>  
+  mutate(success = sample(success,
+                      size = length(success),
+                      replace = TRUE)) |> 
+  ungroup() |> 
+  mutate(success_fct = factor(success, labels = c("Fail", "Succeed")))
 
 ```
 
@@ -261,7 +264,13 @@ one_bootstrap <- ??? %>%
 #| eval: false
 
 bootstrap <- function(i) {
-  ??? %>% 
+ one_bootstrap <- restoration |>  
+  group_by(treatment) |> 
+  mutate(success = sample(success,
+                      size = length(success),
+                      replace = TRUE)) |> 
+  ungroup() |> 
+  mutate(success_fct = factor(success, labels = c("Fail", "Succeed"))) |>
     mutate(trial = i)
 }
 
