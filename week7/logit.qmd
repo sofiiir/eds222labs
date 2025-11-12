@@ -1,0 +1,56 @@
+---
+title: "logit"
+format: html
+---
+```{r}
+library(tidyverse)
+```
+
+Notes about this logit. At 0.5 the probability is 0. 
+
+```{r}
+p <- seq(0.01, 
+         0.999, 
+         length.out =1e4)
+logit_p <- log(p / (1 - p))
+ggplot(tibble(p, logit_p),
+       aes(p, logit_p)) +
+  geom_line()
+```
+
+```{r}
+x <- seq(0, 
+         100, 
+         length.out =1e4)
+beta0 <- -5
+beta1 <- 0.1
+logit_p <- beta0 + beta1 *x
+ggplot(tibble(x, logit_p),
+       aes(x, logit_p)) +
+  geom_line()
+```
+```{r}
+p <- exp(logit_p) / 
+  (1 + exp(logit_p))
+ggplot(tibble(x, p),
+       aes(x, p )) +
+  geom_line()
+```
+
+```{r}
+pct_hisp <- seq(0, 100, length.out = 1e3)
+beta0 <- -10
+beta1 <- 0.2
+logit_p <- beta0 + beta1 * pct_hisp
+
+# take the inverse of logit_p 
+p <- exp(logit_p) / (1 + exp(logit_p))
+ggplot(tibble(pct_hisp, p),
+       aes(pct_hisp, p)) +
+  geom_line()
+```
+#### Interpretations with changes 
+If we increase beta 1 the line approaches 1 sooner. 
+If we flip the sign of beta 1 changes whether we go up or down from the y-intercept. 
+If we decrease beta 0 by 2 the line is pulled further down closer to zero
+If we flip the sign of beta 0 the line is pulled all the way up to 1. 
