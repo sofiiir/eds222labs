@@ -293,20 +293,21 @@ class_model_ph <- glm(violation ~ pctpov * pcthisp, # formula: response ~ predic
 ```{r}
 confint(class_model_ph)["pcthisp", ]
 ```
+
 The 95% CI for the % Hispanic coefficient is -0.010 and -0.002.
 
 ```{r}
 # summary for the 
 summary(class_model_ph)$coefficients[4, 4]
 ```
-The interaction between class and race is significantly different than 0. 
+
+The interaction between class and race is significantly different than 0.
 
 ```{r}
 # a grid of predictors to generate predictions for
 pred_grid <- expand_grid(pctpov = 0:100,
                          pcthisp = 0:100)
 ```
-
 
 The coefficient for an interaction term in a logistic regression model is very difficult to interpret on its own! But that value has important consequences for the lives of millions of people. Predictions are usually more straightforward to interpret than coefficients. Use your figure and the outputs of `summary()` and `confint()` to reflect on the following prompt. Reply to the corresponding thread on Slack with your reflection to get 1 token.
 
