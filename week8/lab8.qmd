@@ -115,6 +115,7 @@ Figure 3: Maps of wildfires in 1980, 2000, and 2020.
  #       y = "Fires >10k acres (n)",
  #       colour = "Year")
 
+# scalefillstep2
 
 ggplot(wildfires_data, aes(x = mean_vpd_kpa, y = n_fires)) +
   geom_point(aes(colour = fire_year),
@@ -155,6 +156,9 @@ For more details about vapor pressure deficit and its relationship with fires, s
 ```{r}
 #| label: fit-model
 
+poisson_model <- glm(n_fires ~ mean_vpd_kpa,
+                     data = wildfires_data,
+                     family = poisson(link = "log"))
 
 
 ```
@@ -168,7 +172,16 @@ As with logistic regression, the coefficients of a Poisson regression model are 
 ```{r}
 #| label: predict-fires
 
+# a grid of predictors to generate predictions for
+pred_grid <- expand_grid(mean_vpd_kpa = seq(from = 0, to = 3, length.out = 100))
 
+# Based on the model what would the lambda be for all of the values in the pred_grid
+# generate predictions
+poisson_model_pred <- pred_grid |> 
+  mutate(pred_lambda = predict(object = poisson_model,
+                     newdata = pred_grid,
+                     type = "response")) # looking at lambda
+                      # if type = "link" looking at the logit scale 
 
 ```
 
@@ -179,9 +192,74 @@ As with logistic regression, the coefficients of a Poisson regression model are 
 ```{r}
 #| label: plot-predictions
 
-
-
+ggplot(poisson_model_pred, aes(x = mean_vpd_kpa, y = pred_lambda)) +
+  geom_line() 
 ```
+
+```{r}
+pois_model_se <- predict(object = poisson_model,
+                          newdata = pred_grid,
+                          type = "link", # stay in link space
+                          se.fit = TRUE) #get the SE of the fit
+
+
+# exp(qnorm(c(0.025, 0.975), mean = pois_model_se$fit, sd = pois_model_se$se.fit))
+
+
+
+poisson_model_pred <- pred_grid |> 
+  mutate(
+    # get log(lambda)
+    log_lambda = pois_model_se$fit,
+    
+    # 95% in link space
+    log_lambda_se = pois_model_se$se.fit,
+    log_lambda_lwr = qnorm(0.025, mean = log_lambda, sd = log_lambda_se),
+    log_lambda_upr = qnorm(0.975, mean = log_lambda, sd = log_lambda_se),
+    
+    # undo the link function using the exp
+    lambda = exp(log_lambda),
+    lambda_lwr = exp(log_lambda_lwr),
+    lambda_upr = exp(log_lambda_upr)
+  )
+```
+
+```{r}
+#| label: plot-predictions
+
+# plots only the lambda confidence interval
+ggplot(poisson_model_pred, aes(x = mean_vpd_kpa, y = lambda)) +
+   geom_ribbon(aes(ymin = lambda_lwr, ymax = lambda_upr), alpha = 0.2) +
+  geom_line() +
+  geom_point(data = wildfires_data, aes(x = mean_vpd_kpa, y = n_fires, color = fire_year))+
+  xlim(1.9, 2.7) +
+  ylim(0, 40) +
+  labs(x = "Mean VPD (kpa)",
+       y = "Fires >10k acres(n)")
+```
+
+```{r}
+# make the pois steps where 95% of the points are predicted to be 
+poisson_model_pred <- poisson_model_pred |>
+  mutate(
+    pois_lwr = qpois(0.025, lambda = lambda),
+    pois_upr = qpois(0.975, lambda = lambda)
+    
+  )
+```
+
+```{r}
+ggplot(poisson_model_pred, aes(x = mean_vpd_kpa, y = lambda)) +
+   geom_ribbon(aes(ymin = lambda_lwr, ymax = lambda_upr), alpha = 0.2) +
+  geom_ribbon(aes(ymin = pois_lwr, ymax = pois_upr), alpha = 0.2) +
+  geom_line() +
+  geom_point(data = wildfires_data, aes(x = mean_vpd_kpa, y = n_fires, color = fire_year))+
+  xlim(1.9, 2.8) +
+  ylim(0, 40) +
+  labs(x = "Mean VPD (kpa)",
+       y = "Fires >10k acres(n)")
+```
+
 
 ## **Compare** properly and improperly specified models
 
@@ -197,3 +275,8 @@ Seeing a scatter plot of mean VPD and the number of fires in a year, an uncritic
     Why doesn't that interval make any sense?**
 
 **Based on your answers to the questions above, why is using a properly specified model important?**
+
+```{r}
+lm()
+```
+
