@@ -260,7 +260,6 @@ ggplot(poisson_model_pred, aes(x = mean_vpd_kpa, y = lambda)) +
        y = "Fires >10k acres(n)")
 ```
 
-
 ## **Compare** properly and improperly specified models
 
 Seeing a scatter plot of mean VPD and the number of fires in a year, an uncritical statistics student may think to fit a linear model. But the fact that the response is a *count* should suggest another approach is necessary. Contrast the model summary and predictions from your Poisson model against a linear model.
@@ -277,6 +276,21 @@ Seeing a scatter plot of mean VPD and the number of fires in a year, an uncritic
 **Based on your answers to the questions above, why is using a properly specified model important?**
 
 ```{r}
-lm()
+# wildfire linear model 
+wildfire_lm <- lm(data = wildfires_data, n_fires ~ mean_vpd_kpa)
 ```
 
+```{r}
+summary(wildfire_lm)
+
+```
+
+```{r}
+summary(poisson_model)
+```
+
+The coefficient for the `mean_vpd_kpa` is significant in the poisson model but not in the linear model.
+
+```{r}
+
+```
