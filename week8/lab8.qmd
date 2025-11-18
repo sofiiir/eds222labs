@@ -33,6 +33,7 @@ Complete sections **Poisson model notation and R code** and **Read and explore t
 library(tidyverse)
 library(sf)
 library(terra)
+library(tmap)
 library(tidyterra)
 theme_set(theme_classic(12))
 set.seed(123)
@@ -84,7 +85,6 @@ poisson_model <- glm(count_outcome ~ predictor,
 wildfires_map <- st_read(here::here("week8", "data", "wildfires.shp"))
 vpd <- rast(here::here("week8", "data", "vpd.tiff"))
 wildfires_data <- read_csv(here::here("week8", "data", "wildfires.csv"))
-
 ```
 
 **Recreate the three figures below.** Yours don't have to be exact replicates, but they should communicate the same messages.
@@ -103,8 +103,42 @@ Figure 3: Maps of wildfires in 1980, 2000, and 2020.
 
 ```{r}
 #| label: fig-explore
+#| fig-cap: "Figure 1: A scatter plot showing the relationship between vapor pressure deficit and wildfire occurence."
+
+ # wildfires_data_decade <- wildfires_data |> 
+ #   mutate(decade = floor(fire_year/10) *10) |> 
+ #  group_by(decade) |> 
+ #  ggplot(aes(x = mean_vpd_kpa, y = n_fires)) +
+ #  geom_point(aes(colour = decade),
+ #             colours = c("#8a506c","#d09d4d","#f8c411", "#de8920","#c14a23")) +
+ #  labs(x  = "Mean VPD (kPa)",
+ #       y = "Fires >10k acres (n)",
+ #       colour = "Year")
 
 
+ggplot(wildfires_data, aes(x = mean_vpd_kpa, y = n_fires)) +
+  geom_point(aes(colour = fire_year),
+             colours = c("#8a506c","#d09d4d","#f8c411", "#de8920","#c14a23")) +
+  labs(x  = "Mean VPD (kPa)",
+       y = "Fires >10k acres (n)",
+       colour = "Year")
+
+
+```
+
+```{r}
+#| label: fig2-explore
+#| fig-cap: "Figure 2: Maps of summer VPD in 1980, 2000, and 2020."
+ 
+vpd_filt <- vpd[[c("1980", "2000", "2020")]]
+  
+ggplot() +
+  geom_spatraster(data = vpd_filt) +
+  facet_wrap(~lyr) +
+  scale_fill_gradient(low = "purple", high = "yellow")
+```
+
+```{r}
 
 ```
 
